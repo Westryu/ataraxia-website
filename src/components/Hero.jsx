@@ -11,6 +11,8 @@ const Hero = () => {
     const [showText, setShowText] = useState(false);
     const [videoError, setVideoError] = useState(false);
 
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
     const videoRefs = {
         LAND: useRef(null),
         SKY: useRef(null),
@@ -20,7 +22,14 @@ const Hero = () => {
     useEffect(() => {
         setIsVisible(true);
         const timer = setTimeout(() => setShowText(true), 1500);
-        return () => clearTimeout(timer);
+
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('resize', handleResize);
+        };
     }, []);
 
     const handleStartJourney = () => {
@@ -29,7 +38,7 @@ const Hero = () => {
     };
 
     const handleSectionHover = (section, isHovering) => {
-        if (expandedSection) return;
+        if (expandedSection || isMobile) return; // Disable hover effects on mobile
         const video = videoRefs[section].current;
         if (video) {
             if (isHovering) {
@@ -46,7 +55,10 @@ const Hero = () => {
         } else {
             setExpandedSection(section);
             const video = videoRefs[section].current;
-            if (video) video.play().catch(() => { });
+            if (video) {
+                // On mobile, we might want to ensure it plays on click since hover is disabled
+                video.play().catch(() => { });
+            }
         }
     };
 
@@ -69,6 +81,7 @@ const Hero = () => {
                 position: 'fixed',
                 inset: 0,
                 display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row', /* Responsive layout */
                 background: '#000',
                 zIndex: 2000,
                 overflow: 'hidden'
@@ -83,11 +96,12 @@ const Hero = () => {
                         style={{
                             flex: expandedSection === s.id ? 10 : 1,
                             position: 'relative',
-                            height: '100%',
+                            height: isMobile ? (expandedSection === s.id ? '100%' : '33.33%') : '100%',
                             transition: 'all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1)',
                             cursor: 'pointer',
                             overflow: 'hidden',
-                            borderRight: s.id !== 'SEA' ? '1px solid rgba(255,255,255,0.1)' : 'none'
+                            borderRight: (!isMobile && s.id !== 'SEA') ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                            borderBottom: (isMobile && s.id !== 'SEA') ? '1px solid rgba(255,255,255,0.1)' : 'none'
                         }}
                     >
                         <div style={{
@@ -102,18 +116,19 @@ const Hero = () => {
                                 loop
                                 muted
                                 playsInline
+                                autoPlay={isMobile} /* Auto play on mobile since hover is unavailable */
                                 style={{
                                     position: 'absolute',
                                     width: '100%',
-                                    height: '110%', /* Increased height to allow cropping */
-                                    top: '5%', /* Move down to hide top part */
+                                    height: '110%',
+                                    top: '5%',
                                     left: '0',
                                     objectFit: 'cover',
-                                    opacity: expandedSection === s.id ? 1 : 0.6, /* Increased base opacity */
-                                    filter: expandedSection === s.id ? 'brightness(1.1)' : 'grayscale(30%) blur(2px) brightness(0.8)', /* Dynamic filter */
+                                    opacity: expandedSection === s.id ? 1 : 0.6,
+                                    filter: expandedSection === s.id ? 'brightness(1.1)' : 'grayscale(30%) blur(2px) brightness(0.8)',
                                     transition: 'all 0.8s ease',
-                                    transform: 'scale(1.2)', /* Scale up to ensure coverage while cropping */
-                                    objectPosition: 'center bottom' /* Prioritize bottom part */
+                                    transform: 'scale(1.2)',
+                                    objectPosition: 'center bottom'
                                 }}
                             />
                         </div>
@@ -126,16 +141,16 @@ const Hero = () => {
                             alignItems: 'center',
                             justifyContent: 'center',
                             zIndex: 10,
-                            background: expandedSection === s.id ? 'transparent' : 'rgba(0,0,0,0.3)', /* Lighter overlay */
+                            background: expandedSection === s.id ? 'transparent' : 'rgba(0,0,0,0.3)',
                             transition: 'background 0.8s ease'
                         }}>
                             <h2 style={{
                                 color: '#fff',
-                                fontSize: expandedSection === s.id ? 'clamp(4rem, 15vw, 10rem)' : 'clamp(1.5rem, 5vw, 3rem)',
+                                fontSize: expandedSection === s.id ? 'clamp(3rem, 15vw, 10rem)' : 'clamp(1.2rem, 5vw, 2.5rem)',
                                 fontWeight: '900',
                                 letterSpacing: '0.5em',
                                 transition: 'all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1)',
-                                transform: 'none', /* Removed rotation */
+                                transform: 'none',
                                 whiteSpace: 'nowrap',
                                 textShadow: '0 0 20px rgba(0,0,0,0.5)'
                             }}>
@@ -154,7 +169,9 @@ const Hero = () => {
                                         fontWeight: '700',
                                         cursor: s.id === 'LAND' ? 'pointer' : 'default',
                                         textDecoration: s.id === 'LAND' ? 'underline' : 'none',
-                                        textUnderlineOffset: '8px'
+                                        textUnderlineOffset: '8px',
+                                        textAlign: 'center',
+                                        padding: '0 20px'
                                     }}
                                 >
                                     {s.id === 'LAND' ? 'EXPLORING THE SANCTUARY' : 'COMING SOON'}
@@ -167,12 +184,14 @@ const Hero = () => {
                                 onClick={(e) => { e.stopPropagation(); setExpandedSection(null); }}
                                 style={{
                                     position: 'absolute',
-                                    top: '40px',
-                                    right: '40px',
-                                    background: 'none',
+                                    top: isMobile ? '20px' : '40px',
+                                    right: isMobile ? '20px' : '40px',
+                                    background: 'rgba(0,0,0,0.5)',
+                                    backdropFilter: 'blur(5px)',
                                     border: '1px solid #fff',
                                     color: '#fff',
-                                    padding: '10px 20px',
+                                    padding: '8px 16px',
+                                    fontSize: '0.7rem',
                                     cursor: 'pointer',
                                     zIndex: 100,
                                     borderRadius: 'var(--radius-full)'
@@ -188,7 +207,7 @@ const Hero = () => {
                     onClick={handleBackToHome}
                     style={{
                         position: 'fixed',
-                        bottom: '40px',
+                        bottom: isMobile ? '20px' : '40px',
                         left: '50%',
                         transform: 'translateX(-50%)',
                         background: 'rgba(255,255,255,0.1)',
@@ -202,7 +221,8 @@ const Hero = () => {
                         cursor: 'pointer',
                         zIndex: 100,
                         opacity: expandedSection ? 0 : 1,
-                        transition: 'opacity 0.5s ease'
+                        visibility: expandedSection ? 'hidden' : 'visible',
+                        transition: 'all 0.5s ease'
                     }}
                 >
                     BACK TO HOME
