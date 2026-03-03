@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import '../index.css';
 
-// Mock images using existing assets or placeholders since generation is limited
-import rulesImg from '../assets/rules_image.jpg';
+// 1. 여기에 사용할 이미지를 import 하세요
 import workoutImg from '../assets/workout.jpg';
+import gallery1 from '../assets/gallery_1.jpg';
+import gallery2 from '../assets/gallery_2.jpg';
 
 const OurGallery = () => {
     const [isVisible, setIsVisible] = useState(false);
@@ -12,13 +13,11 @@ const OurGallery = () => {
         setIsVisible(true);
     }, []);
 
+    // 2. 이 배열에 새로운 이미지 객체를 추가하면 갤러리에 나타납니다.
     const galleryImages = [
-        { id: 1, src: workoutImg, title: "Strength & Honor", category: "Training" },
-        { id: 2, src: rulesImg, title: "The Ataraxia Code", category: "Philosophy" },
-        { id: 3, src: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop", title: "Iron Sanctuary", category: "Space" },
-        { id: 4, src: "https://images.unsplash.com/photo-1541534741688-6078c64b5903?q=80&w=1470&auto=format&fit=crop", title: "Soul Focus", category: "Mind" },
-        { id: 5, src: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1470&auto=format&fit=crop", title: "Primal Energy", category: "Community" },
-        { id: 6, src: "https://images.unsplash.com/photo-1571731956672-f2b94d7db0cb?q=80&w=1472&auto=format&fit=crop", title: "Eternal Forge", category: "Power" }
+        { id: 1, src: workoutImg, title: "24hr Rowing challenge" },
+        { id: 2, src: gallery1, title: "strength & focus" },
+        { id: 3, src: gallery2, title: "ice bath recovery" },
     ];
 
     return (
@@ -72,7 +71,7 @@ const OurGallery = () => {
                                     left: 0,
                                     width: '100%',
                                     height: '100%',
-                                    background: 'linear-gradient(to top, rgba(0, 242, 255, 0.6) 0%, transparent 60%)',
+                                    background: 'linear-gradient(to top, rgba(0, 242, 255, 0.6) 20%, transparent 60%)',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     justifyContent: 'flex-end',
@@ -81,17 +80,14 @@ const OurGallery = () => {
                                     transition: 'opacity 0.5s ease'
                                 }}
                             >
-                                <span style={{
-                                    fontSize: '0.7rem',
+                                <h3 style={{
+                                    fontSize: '1.2rem',
                                     color: '#000',
                                     fontWeight: '900',
-                                    letterSpacing: '0.2em',
-                                    textTransform: 'uppercase',
-                                    marginBottom: '4px'
+                                    margin: 0,
+                                    letterSpacing: '0.1em',
+                                    textTransform: 'uppercase'
                                 }}>
-                                    {img.category}
-                                </span>
-                                <h3 style={{ fontSize: '1.4rem', color: '#000', fontWeight: '900', margin: 0 }}>
                                     {img.title}
                                 </h3>
                             </div>

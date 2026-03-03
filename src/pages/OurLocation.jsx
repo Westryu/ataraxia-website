@@ -15,7 +15,8 @@ const OurLocation = () => {
             <div className="content-wrapper" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--spacing-lg)' }}>
                 <div style={{
                     width: '100%',
-                    height: '450px',
+                    maxWidth: '800px', /* Increased size */
+                    aspectRatio: '1 / 1', /* Perfect square */
                     borderRadius: 'var(--radius-lg)',
                     overflow: 'hidden',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
